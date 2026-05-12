@@ -1,0 +1,17 @@
+{
+  "name": "prompt_template",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "build": "bun build --target=node --outdir=dist src/server.ts",
+    "start": "bun dist/server.js",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@hono/node-server": "latest",
+    "@hono/zod-validator": "latest",
+    "hono": "latest",
+    "zod": "latest"
+  }
+}
