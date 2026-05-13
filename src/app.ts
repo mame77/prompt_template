@@ -1,60 +1,52 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { HTTPException } from 'hono/http-exception'
 import { logger } from 'hono/logger'
-import { requestId } from 'hono/request-id'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { healthRoute } from './routes/health.js'
-import { messagesRoute } from './routes/messages.js'
+import { authRoute } from './routes/auth.js'
+import { pagesRoute } from './routes/pages.js'
+import { apiRoute } from './routes/api.js'
+import { seedTemplates } from './db/seed.js'
+
+let seeded = false
 
 export const createApp = () => {
   const app = new Hono()
 
-  app.use('*', requestId())
   app.use('*', secureHeaders())
   app.use('*', cors())
   app.use('*', logger())
 
-  app.get('/', (c) =>
-    c.json({
-      name: 'prompt_template',
-      status: 'ok',
-    }),
-  )
+  app.use('*', async (c, next) => {
+    if (!seeded) {
+      seeded = true
+      try {
+        await seedTemplates(c.env as Record<string, unknown>)
+      } catch (e) {
+        console.error('Seed error:', e)
+      }
+    }
+    return next()
+  })
 
-  app.route('/health', healthRoute)
-  app.route('/messages', messagesRoute)
+  app.route('/', pagesRoute)
+  app.route('/', authRoute)
+  app.route('/', apiRoute)
 
   app.notFound((c) =>
-    c.json(
-      {
-        error: {
-          message: 'Not Found',
-        },
-      },
+    c.html(
+      `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>Not Found</title><link rel="stylesheet" href="/style.css"></head><body><div class="container" style="text-align:center;padding:4rem 0"><h1>404</h1><p>Page not found.</p><a href="/">Go Home</a></div></body></html>`,
       404,
     ),
   )
 
   app.onError((error, c) => {
-    if (error instanceof HTTPException) {
-      return error.getResponse()
-    }
-
     console.error(error)
-
-    return c.json(
-      {
-        error: {
-          message: 'Internal Server Error',
-        },
-      },
+    return c.html(
+      `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>Error</title><link rel="stylesheet" href="/style.css"></head><body><div class="container" style="text-align:center;padding:4rem 0"><h1>500</h1><p>Internal Server Error</p><a href="/">Go Home</a></div></body></html>`,
       500,
     )
   })
 
   return app
 }
-
-export type AppType = ReturnType<typeof createApp>
