@@ -3,15 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun --watch src/server.ts",
-    "build": "bun build --target=node --outdir=dist src/server.ts",
-    "start": "bun dist/server.js",
+    "dev": "wrangler dev --env-file .env",
+    "dev:local": "wrangler dev --env-file .env --local",
+    "deploy": "wrangler deploy",
     "test": "bun test"
   },
   "dependencies": {
-    "@hono/node-server": "latest",
-    "@hono/zod-validator": "latest",
     "hono": "latest",
     "zod": "latest"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
   }
 }
