@@ -2,4 +2,5 @@ node_modules/
 dist/
 .env
 data/
+.wrangler/
 .DS_Store
