@@ -9,8 +9,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "hono": "latest",
-    "zod": "latest"
+    "hono": "latest"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

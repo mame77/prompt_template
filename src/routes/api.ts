@@ -1,9 +1,6 @@
 import { Hono } from 'hono'
 import { getSessionUser } from '../lib/auth.js'
-
-type Env = Record<string, unknown>
-
-const getDB = (c: any) => (c.env as Env).DB
+import { getDB } from '../lib/db.js'
 
 export const apiRoute = new Hono()
 

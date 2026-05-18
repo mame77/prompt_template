@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
+import { logger } from 'hono/logger'
 
 import { authRoute } from './routes/auth.js'
 import { pagesRoute } from './routes/pages.js'
@@ -14,7 +13,6 @@ export const createApp = () => {
   const app = new Hono()
 
   app.use('*', secureHeaders())
-  app.use('*', cors())
   app.use('*', logger())
 
   app.use('*', async (c, next) => {

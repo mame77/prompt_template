@@ -1,14 +1,19 @@
 name = "prompt-template"
 main = "src/index.ts"
 compatibility_date = "2025-05-13"
-compatibility_flags = ["nodejs_compat"]
 
 assets = { directory = "public" }
 
 [[d1_databases]]
 binding = "DB"
 database_name = "prompt-template-db"
+# ↓ 実DB作成後のIDに書き換え: bun x wrangler d1 create prompt-template-db
 database_id = "00000000-0000-0000-0000-000000000000"
 
 [vars]
-SESSION_SECRET = "change-me-to-a-random-string-at-least-32-chars!!"
+GOOGLE_CLIENT_ID = ""
+GOOGLE_REDIRECT_URI = "https://prompt-template.あなたのドメイン.workers.dev/auth/google"
+
+# SESSION_SECRET, GOOGLE_CLIENT_SECRET は secret に設定:
+# echo "＜値＞" | bun x wrangler secret put SESSION_SECRET
+# echo "＜値＞" | bun x wrangler secret put GOOGLE_CLIENT_SECRET

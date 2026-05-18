@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { getSessionUser } from '../lib/auth.js'
+import { getDB } from '../lib/db.js'
 import { extractVariables, renderPrompt, autoLabel } from '../lib/render.js'
 import type { VariableConfig } from '../lib/render.js'
 import {
@@ -28,10 +29,6 @@ interface TemplateRow {
   author_id: string
   username: string
 }
-
-type Env = Record<string, unknown>
-
-const getDB = (c: any) => (c.env as Env).DB
 
 export const pagesRoute = new Hono()
 
