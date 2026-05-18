@@ -33,7 +33,7 @@ export const createApp = () => {
 
   app.notFound((c) =>
     c.html(
-      `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>Not Found</title><link rel="stylesheet" href="/style.css"></head><body><div class="container" style="text-align:center;padding:4rem 0"><h1>404</h1><p>Page not found.</p><a href="/">Go Home</a></div></body></html>`,
+      `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Not Found</title><link rel="stylesheet" href="/style.css"></head><body><div class="container" style="text-align:center;padding:5rem 0"><h1 style="font-size:3rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">404</h1><p style="color:var(--text-secondary);margin:0.5rem 0 1.5rem">Page not found.</p><a href="/" class="btn btn-secondary">Go Home</a></div></body></html>`,
       404,
     ),
   )
@@ -41,7 +41,7 @@ export const createApp = () => {
   app.onError((error, c) => {
     console.error(error)
     return c.html(
-      `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>Error</title><link rel="stylesheet" href="/style.css"></head><body><div class="container" style="text-align:center;padding:4rem 0"><h1>500</h1><p>Internal Server Error</p><a href="/">Go Home</a></div></body></html>`,
+      `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Error</title><link rel="stylesheet" href="/style.css"></head><body><div class="container" style="text-align:center;padding:5rem 0"><h1 style="font-size:3rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">500</h1><p style="color:var(--text-secondary);margin:0.5rem 0 1.5rem">Internal Server Error</p><a href="/" class="btn btn-secondary">Go Home</a></div></body></html>`,
       500,
     )
   })
