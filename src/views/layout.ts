@@ -25,7 +25,7 @@ export const layout = (
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${opts.title} — Prompt Template</title>
+  <title>${opts.title} — プロンプトテンプレート</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script>
@@ -39,7 +39,7 @@ export const layout = (
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="/" class="logo">Prompt Template</a>
+      <a href="/" class="logo">プロンプトテンプレート</a>
       <nav class="header-nav">
         <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切替" aria-label="テーマ切替">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -81,65 +81,6 @@ export const templateCard = (t: {
     <p class="card-desc">${escapeHtml(t.description)}</p>
     <span class="card-author">作成者: ${escapeHtml(t.username)}</span>
   </a>`
-
-export const fieldRow = (
-  key: string,
-  label: string,
-  type: 'text' | 'select' = 'text',
-  options?: string[],
-  placeholder?: string,
-  value = '',
-) => {
-  const labelHtml = `<label class="field-label" for="field-${key}">${escapeHtml(label)}</label>`
-
-  if (type === 'select' && options && options.length > 0) {
-    const opts = options
-      .map(
-        (o) =>
-          `<option value="${escapeHtml(o)}"${o === value ? ' selected' : ''}>${escapeHtml(o)}</option>`,
-      )
-      .join('')
-    return `
-      <div class="field-row">
-        ${labelHtml}
-        <select id="field-${key}" name="${key}" class="field-input field-select">
-          <option value="">選択してください</option>
-          ${opts}
-        </select>
-      </div>`
-  }
-
-  return `
-    <div class="field-row">
-      ${labelHtml}
-      <input
-        type="text"
-        id="field-${key}"
-        name="${key}"
-        class="field-input"
-        placeholder="${escapeHtml(placeholder ?? '')}"
-        value="${escapeHtml(value)}"
-        autocomplete="off"
-      >
-    </div>`
-}
-
-export const splitLayout = (left: string, right: string) => `
-  <div class="split-layout">
-    <div class="split-left">${left}</div>
-    <div class="split-right">${right}</div>
-  </div>`
-
-export const previewPanel = (promptText: string) => `
-  <div class="preview-panel">
-    <div class="preview-header">
-      <h2 class="preview-title">生成されたプロンプト</h2>
-      <button class="btn btn-primary btn-copy" id="copy-btn-main" onclick="copyPrompt(this)">
-        コピー
-      </button>
-    </div>
-    <pre id="prompt-display" class="prompt-output">${escapeHtml(promptText)}</pre>
-  </div>`
 
 export const tabNav = (
   activeTab: string,

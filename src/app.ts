@@ -17,9 +17,9 @@ export const createApp = () => {
 
   app.use('*', async (c, next) => {
     if (!seeded) {
-      seeded = true
       try {
         await seedTemplates(c.env as Record<string, unknown>)
+        seeded = true
       } catch (e) {
         console.error('Seed error:', e)
       }

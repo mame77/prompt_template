@@ -1,15 +1,11 @@
 import { Hono } from 'hono'
 import { getSessionUser } from '../lib/auth.js'
 import { getDB } from '../lib/db.js'
-import { extractVariables, renderPrompt, autoLabel } from '../lib/render.js'
 import type { VariableConfig } from '../lib/render.js'
 import {
   layout,
   escapeHtml,
   templateCard,
-  fieldRow,
-  splitLayout,
-  previewPanel,
   tabNav,
   categoryPills,
   searchBar,
@@ -122,7 +118,7 @@ pagesRoute.get('/templates/new', async (c) => {
           <div class="field-row">
             <label class="field-label" for="category">カテゴリ</label>
             <select id="category" name="category" class="field-input field-select">
-              <option value="">-- select --</option>
+              <option value="">-- 選択 --</option>
               ${CATEGORIES.filter((c) => c !== 'すべて').map((c) => `<option value="${c}">${c}</option>`).join('')}
             </select>
           </div>
@@ -272,22 +268,6 @@ pagesRoute.get('/templates/:id', async (c) => {
     variables = JSON.parse(row.variable_config || '[]')
   } catch {}
 
-  const detectedVars = extractVariables(body)
-  const fieldHtml = detectedVars
-    .map((key) => {
-      const config = variables.find((v) => v.key === key)
-      const label = config?.label ?? autoLabel(key)
-      const type = config?.type ?? 'text'
-      return fieldRow(key, label, type, config?.options, config?.placeholder)
-    })
-    .join('\n')
-
-  const bodyPreview = body
-    ? `<div class="body-preview"><pre class="body-text">${escapeHtml(body)}</pre></div>`
-    : ''
-
-  const hasBody = !!body
-
   const metaHtml = `
     <div class="template-meta">
       <div class="template-meta-top">
@@ -299,7 +279,7 @@ pagesRoute.get('/templates/:id', async (c) => {
       ${isOwner ? `<form action="/templates/${id}/delete" method="POST" class="inline-form delete-form" onsubmit="return confirm('このテンプレートを削除しますか？')"><button class="btn-text btn-danger">削除</button></form>` : ''}
     </div>`
 
-  if (!hasBody) {
+  if (!body) {
     return c.html(
       layout(
         { title: row.title, user },
@@ -314,73 +294,125 @@ pagesRoute.get('/templates/:id', async (c) => {
     )
   }
 
-  const formHtml = `
-    <form
-      hx-post="/templates/${id}/render"
-      hx-target="#result-area"
-      hx-swap="innerHTML"
-      class="template-form"
-    >
-      ${bodyPreview}
-      ${fieldHtml}
-      <button type="submit" class="btn btn-primary btn-generate">
-        プロンプトを生成
-      </button>
-    </form>`
+  const fieldsHtml = variables
+    .filter((v) => body.includes(`{{${v.key}}}`))
+    .map((v) => {
+      const label = escapeHtml(v.label || v.key)
+      if (v.type === 'select' && v.options && v.options.length > 0) {
+        const opts = v.options
+          .map(
+            (o) =>
+              `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`,
+          )
+          .join('')
+        return `
+        <div class="field-card">
+          <label class="field-card-label">${label}</label>
+          <select class="field-card-input" data-var="${v.key}" onchange="selectNext(this)">
+            <option value="">選択してください</option>
+            ${opts}
+          </select>
+        </div>`
+      }
+      return `
+        <div class="field-card">
+          <label class="field-card-label">${label}</label>
+          <input type="text" class="field-card-input" data-var="${v.key}" placeholder="${label}" autocomplete="off">
+        </div>`
+    })
+    .join('\n')
 
-  const previewHtml = `
-    <div id="result-area">
-      ${previewPanel(`左側の項目を入力して「プロンプトを生成」をクリックしてください`)}
-    </div>`
+  const pageContent = `
+    <div class="template-page template-use-page">
+      ${metaHtml}
+
+      <div class="fields-section">
+        ${fieldsHtml || '<p class="empty-state">このテンプレートには入力項目がありません</p>'}
+      </div>
+
+      <div class="complete-section">
+        <button class="btn btn-primary btn-complete" id="generate-btn" onclick="generatePrompt()">
+          完了
+        </button>
+      </div>
+
+      <div class="result-panel" id="result-area" style="display:none;">
+        <div class="result-header">
+          <h2 class="result-title">生成されたプロンプト</h2>
+          <button class="btn btn-primary btn-copy" onclick="copyPrompt(this)">コピー</button>
+        </div>
+        <pre class="prompt-output" id="prompt-display"></pre>
+      </div>
+    </div>
+
+    <div id="toast" class="toast">コピーしました</div>
+
+    <script id="template-raw-data" type="application/json">${JSON.stringify(body)}</script>
+    <script>
+    var TEMPLATE_BODY = JSON.parse(document.getElementById('template-raw-data').textContent);
+    var BR = String.fromCharCode(10);
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var first = document.querySelector('[data-var]');
+      if (first) first.focus();
+      document.querySelector('.fields-section').addEventListener('keydown', function(e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        selectNext(e.target);
+      });
+    });
+
+    function selectNext(el) {
+      var all = document.querySelectorAll('[data-var]');
+      var idx = Array.prototype.indexOf.call(all, el);
+      if (idx >= 0 && idx < all.length - 1) {
+        all[idx + 1].focus();
+      } else if (idx === all.length - 1) {
+        document.getElementById('result-area').style.display = 'none';
+        generatePrompt();
+      }
+    }
+
+    function generatePrompt() {
+      var btn = document.getElementById('generate-btn');
+      if (btn.disabled) return;
+      btn.disabled = true;
+      btn.textContent = 'コピー済み';
+      setTimeout(function() {
+        btn.disabled = false;
+        btn.textContent = '完了';
+      }, 2500);
+
+      var inputs = document.querySelectorAll('[data-var]');
+      var result = TEMPLATE_BODY;
+      inputs.forEach(function(el) {
+        var key = el.getAttribute('data-var');
+        var value = el.value || el.getAttribute('placeholder') || ('{{' + key + '}}');
+        result = result.replace('{{' + key + '}}', value);
+      });
+      var area = document.getElementById('result-area');
+      area.style.display = 'block';
+      area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      var wrapped = "\`\`\`" + BR + result + BR + "\`\`\`";
+      document.getElementById('prompt-display').textContent = wrapped;
+      navigator.clipboard.writeText(wrapped).then(showToast);
+    }
+
+    function copyPrompt(btn) {
+      var text = document.getElementById('prompt-display').textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(showToast);
+    }
+
+    function showToast() {
+      var t = document.getElementById('toast');
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(function() { t.classList.remove('show'); }, 2000);
+    }
+    </script>`
 
   return c.html(
-    layout(
-      { title: row.title, user },
-      `
-      <div class="template-page">
-        ${metaHtml}
-        ${splitLayout(formHtml, previewHtml)}
-      </div>
-      <script>
-        function copyPrompt(btn) {
-          var text = document.getElementById('prompt-display');
-          if (!text) return;
-          navigator.clipboard.writeText(text.textContent).then(function() {
-            var orig = btn.textContent;
-            btn.textContent = 'コピーしました！';
-            setTimeout(function() { btn.textContent = orig; }, 2000);
-          });
-        }
-      </script>`,
-    ),
+    layout({ title: row.title, user }, pageContent),
   )
-})
-
-pagesRoute.post('/templates/:id/render', async (c) => {
-  const db = getDB(c)
-  const id = c.req.param('id')
-
-  let row: { body: string; variable_config: string } | undefined
-  try {
-    row = (await db
-      .prepare('SELECT body, variable_config FROM templates WHERE id = ?')
-      .bind(id)
-      .first()) as { body: string; variable_config: string } | undefined
-  } catch (e) {
-    console.error('Query error:', e)
-  }
-
-  if (!row) return c.notFound()
-
-  const parsedBody = await c.req.parseBody()
-
-  const detectedVars = extractVariables(row.body)
-  const values: Record<string, string> = {}
-  for (const v of detectedVars) {
-    values[v] = (parsedBody[v] as string) || ''
-  }
-
-  const rendered = renderPrompt(row.body, values)
-
-  return c.html(previewPanel(rendered))
 })
