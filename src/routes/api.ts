@@ -1,9 +1,7 @@
 import { Hono } from 'hono'
 import { getSessionUser } from '../lib/auth.js'
-
-type Env = Record<string, unknown>
-
-const getDB = (c: any) => (c.env as Env).DB
+import { getDB } from '../lib/db.js'
+import { uuidv7 } from '../lib/id.js'
 
 export const apiRoute = new Hono()
 
@@ -32,7 +30,7 @@ apiRoute.post('/templates', async (c) => {
   }
 
   const db = getDB(c)
-  const id = crypto.randomUUID()
+  const id = uuidv7()
   const now = new Date().toISOString()
 
   try {

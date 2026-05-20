@@ -25,7 +25,13 @@ export const layout = (
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${opts.title} — Prompt Template</title>
+  <title>${opts.title} — プロンプトテンプレート</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script>
+    (function(){var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')})();
+    function toggleTheme(){var d=document.documentElement;var n=d.getAttribute('data-theme')==='dark'?'light':'dark';d.setAttribute('data-theme',n);localStorage.setItem('theme',n)}
+  </script>
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   <link rel="stylesheet" href="/style.css">
   ${opts.extraHead ?? ''}
@@ -33,15 +39,19 @@ export const layout = (
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="/" class="logo">Prompt Template</a>
+      <a href="/" class="logo">プロンプトテンプレート</a>
       <nav class="header-nav">
+        <button class="theme-toggle" onclick="toggleTheme()" title="テーマ切替" aria-label="テーマ切替">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
         ${opts.user
-          ? `<a href="/?tab=mine" class="nav-link">My Templates</a>
+          ? `<a href="/?tab=mine" class="nav-link">マイテンプレート</a>
              <form action="/auth/logout" method="POST" class="inline-form">
-               <button type="submit" class="btn-text">Logout</button>
+               <button type="submit" class="btn-text">ログアウト</button>
              </form>
              <span class="user-name">${escapeHtml(opts.user.username)}</span>`
-          : `<a href="/login" class="btn btn-primary">Sign in with Google</a>`}
+          : `<a href="/login" class="btn btn-primary">Google でログイン</a>`}
       </nav>
     </div>
   </header>
@@ -69,67 +79,8 @@ export const templateCard = (t: {
     ${t.category ? `<span class="card-category">${escapeHtml(t.category)}</span>` : ''}
     <h3 class="card-title">${escapeHtml(t.title)}</h3>
     <p class="card-desc">${escapeHtml(t.description)}</p>
-    <span class="card-author">by ${escapeHtml(t.username)}</span>
+    <span class="card-author">作成者: ${escapeHtml(t.username)}</span>
   </a>`
-
-export const fieldRow = (
-  key: string,
-  label: string,
-  type: 'text' | 'select' = 'text',
-  options?: string[],
-  placeholder?: string,
-  value = '',
-) => {
-  const labelHtml = `<label class="field-label" for="field-${key}">${escapeHtml(label)}</label>`
-
-  if (type === 'select' && options && options.length > 0) {
-    const opts = options
-      .map(
-        (o) =>
-          `<option value="${escapeHtml(o)}"${o === value ? ' selected' : ''}>${escapeHtml(o)}</option>`,
-      )
-      .join('')
-    return `
-      <div class="field-row">
-        ${labelHtml}
-        <select id="field-${key}" name="${key}" class="field-input field-select">
-          <option value="">-- select --</option>
-          ${opts}
-        </select>
-      </div>`
-  }
-
-  return `
-    <div class="field-row">
-      ${labelHtml}
-      <input
-        type="text"
-        id="field-${key}"
-        name="${key}"
-        class="field-input"
-        placeholder="${escapeHtml(placeholder ?? '')}"
-        value="${escapeHtml(value)}"
-        autocomplete="off"
-      >
-    </div>`
-}
-
-export const splitLayout = (left: string, right: string) => `
-  <div class="split-layout">
-    <div class="split-left">${left}</div>
-    <div class="split-right">${right}</div>
-  </div>`
-
-export const previewPanel = (promptText: string) => `
-  <div class="preview-panel">
-    <div class="preview-header">
-      <h2 class="preview-title">Generated Prompt</h2>
-      <button class="btn btn-primary btn-copy" id="copy-btn-main" onclick="copyPrompt(this)">
-        Copy Prompt
-      </button>
-    </div>
-    <pre id="prompt-display" class="prompt-output">${escapeHtml(promptText)}</pre>
-  </div>`
 
 export const tabNav = (
   activeTab: string,
@@ -149,8 +100,8 @@ export const tabNav = (
   }
   return `
     <div class="tab-bar">
-      <a href="/" class="tab ${tabAll}" hx-get="/" hx-target=".template-grid" hx-swap="outerHTML" hx-push-url="true">All</a>
-      ${showMine ? `<a href="/?tab=mine" class="tab ${tabMine}" hx-get="/?tab=mine" hx-target=".template-grid" hx-swap="outerHTML" hx-push-url="true">My Templates</a>` : ''}
+      <a href="/" class="tab ${tabAll}" hx-get="/" hx-target=".template-grid" hx-swap="outerHTML" hx-push-url="true">すべて</a>
+      ${showMine ? `<a href="/?tab=mine" class="tab ${tabMine}" hx-get="/?tab=mine" hx-target=".template-grid" hx-swap="outerHTML" hx-push-url="true">自分のテンプレート</a>` : ''}
     </div>`
 }
 
@@ -175,7 +126,7 @@ export const searchBar = (query: string) => `
       type="text"
       name="q"
       class="field-input search-input"
-      placeholder="Search templates..."
+      placeholder="テンプレートを検索..."
       value="${escapeHtml(query)}"
       hx-get="/"
       hx-trigger="keyup changed delay:300ms"
@@ -213,19 +164,19 @@ export const variableConfigPanel = (body: string, configJson: string) => {
         </div>
         <div class="var-config-body">
           <div class="var-config-field">
-            <label class="field-label">Label</label>
+            <label class="field-label">ラベル</label>
             <input type="text" name="var_label_${key}" class="field-input" value="${escapeHtml(label)}" placeholder="${escapeHtml(key)}">
           </div>
           <div class="var-config-field">
-            <label class="field-label">Type</label>
+            <label class="field-label">種類</label>
             <select name="var_type_${key}" class="field-input field-select">
-              <option value="text"${type === 'text' ? ' selected' : ''}>Text</option>
-              <option value="select"${type === 'select' ? ' selected' : ''}>Select</option>
+              <option value="text"${type === 'text' ? ' selected' : ''}>テキスト</option>
+              <option value="select"${type === 'select' ? ' selected' : ''}>選択式</option>
             </select>
           </div>
           <div class="var-config-field var-options-field"${type !== 'select' ? ' style="display:none"' : ''}>
-            <label class="field-label">Options (comma separated)</label>
-            <input type="text" name="var_options_${key}" class="field-input" value="${escapeHtml(opts)}" placeholder="option1, option2, option3">
+            <label class="field-label">選択肢（カンマ区切り）</label>
+            <input type="text" name="var_options_${key}" class="field-input" value="${escapeHtml(opts)}" placeholder="選択肢1, 選択肢2, 選択肢3">
           </div>
         </div>
       </div>`

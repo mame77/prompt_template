@@ -19,13 +19,13 @@ authRoute.get('/login', async (c) => {
 
   return c.html(
     layout(
-      { title: 'Login', user: null },
+      { title: 'ログイン', user: null },
       `
       <div class="login-page">
-        <h1>Login</h1>
-        <p>Sign in with Google to create your own prompt templates.</p>
+        <h1>ログイン</h1>
+        <p>Google アカウントでログインして、プロンプトテンプレートを作成しましょう。</p>
         <a href="${url}" class="btn btn-primary btn-google">
-          Sign in with Google
+          Google でログイン
         </a>
       </div>`,
     ),

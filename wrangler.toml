@@ -1,14 +1,11 @@
 name = "prompt-template"
 main = "src/index.ts"
 compatibility_date = "2025-05-13"
-compatibility_flags = ["nodejs_compat"]
 
 assets = { directory = "public" }
 
 [[d1_databases]]
 binding = "DB"
 database_name = "prompt-template-db"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "60c12bd2-1beb-4a0d-85f9-6cb5b2dc9ddc"
 
-[vars]
-SESSION_SECRET = "change-me-to-a-random-string-at-least-32-chars!!"

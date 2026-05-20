@@ -1,7 +1,8 @@
+import { uuidv7 } from '../lib/id.js'
+
 const sampleTemplates = [
   {
-    id: 'sample-ui-component',
-    title: 'UI Component Spec',
+    title: 'UIコンポーネント仕様',
     description: 'Figmaデザイン用のUIコンポーネント仕様を生成します。',
     category: 'デザイン',
     tags: 'Figma, UI, design',
@@ -13,16 +14,15 @@ Style: {{style}}
 States: {{states}}
 Colors: {{colors}}`,
     variable_config: [
-      { key: 'component', label: 'Component', type: 'text' },
-      { key: 'purpose', label: 'Purpose', type: 'text' },
-      { key: 'style', label: 'Style', type: 'select', options: ['Minimal', 'Modern', 'Classic', 'Bold'] },
-      { key: 'states', label: 'States', type: 'text' },
-      { key: 'colors', label: 'Colors', type: 'text' },
+      { key: 'component', label: 'コンポーネント名', type: 'text' },
+      { key: 'purpose', label: '目的', type: 'text' },
+      { key: 'style', label: 'スタイル', type: 'select', options: ['ミニマル', 'モダン', 'クラシック', 'ボールド'] },
+      { key: 'states', label: '状態（hover/active等）', type: 'text' },
+      { key: 'colors', label: 'カラーコード', type: 'text' },
     ],
   },
   {
-    id: 'sample-landing-page',
-    title: 'Landing Page Layout',
+    title: 'ランディングページ構成',
     description: 'Figmaワイヤーフレーミング用のランディングページ構成を生成します。',
     category: 'デザイン',
     tags: 'Figma, landing, wireframe',
@@ -34,15 +34,14 @@ Target Audience: {{audience}}
 Tone: {{tone}}
 Breakpoints: {{breakpoints}}`,
     variable_config: [
-      { key: 'purpose', label: 'Purpose', type: 'text' },
-      { key: 'sections', label: 'Sections', type: 'text' },
-      { key: 'audience', label: 'Target Audience', type: 'text' },
-      { key: 'tone', label: 'Tone', type: 'select', options: ['Professional', 'Modern', 'Friendly', 'Luxury'] },
-      { key: 'breakpoints', label: 'Breakpoints', type: 'text' },
+      { key: 'purpose', label: 'ページの目的', type: 'text' },
+      { key: 'sections', label: 'セクション一覧', type: 'text' },
+      { key: 'audience', label: 'ターゲットユーザー', type: 'text' },
+      { key: 'tone', label: 'デザイントーン', type: 'select', options: ['プロフェッショナル', 'モダン', 'フレンドリー', 'ラグジュアリー'] },
+      { key: 'breakpoints', label: 'ブレークポイント', type: 'text' },
     ],
   },
   {
-    id: 'sample-blog-post',
     title: 'ブログ記事構成案',
     description: 'テーマに沿ったブログ記事の構成を提案します。',
     category: '執筆',
@@ -63,7 +62,6 @@ Breakpoints: {{breakpoints}}`,
     ],
   },
   {
-    id: 'sample-code-review',
     title: 'コードレビュー依頼',
     description: 'プルリクエストのコードレビュー依頼文を生成します。',
     category: 'コード',
@@ -76,16 +74,15 @@ Focus Areas: {{focusAreas}}
 Priority: {{priority}}
 Related Issue: {{issue}}`,
     variable_config: [
-      { key: 'language', label: 'Language', type: 'select', options: ['TypeScript', 'Python', 'Go', 'Rust', 'Java'] },
-      { key: 'prTitle', label: 'PR Title', type: 'text' },
-      { key: 'description', label: 'Description', type: 'text' },
-      { key: 'focusAreas', label: 'Focus Areas', type: 'text' },
-      { key: 'priority', label: 'Priority', type: 'select', options: ['Low', 'Medium', 'High', 'Critical'] },
-      { key: 'issue', label: 'Related Issue', type: 'text' },
+      { key: 'language', label: '言語', type: 'select', options: ['TypeScript', 'Python', 'Go', 'Rust', 'Java'] },
+      { key: 'prTitle', label: 'PRタイトル', type: 'text' },
+      { key: 'description', label: '説明', type: 'text' },
+      { key: 'focusAreas', label: '重点レビュー箇所', type: 'text' },
+      { key: 'priority', label: '優先度', type: 'select', options: ['低', '中', '高', '最重要'] },
+      { key: 'issue', label: '関連Issue', type: 'text' },
     ],
   },
   {
-    id: 'sample-learning-plan',
     title: '学習計画立案',
     description: '目標に合わせた学習計画を生成します。',
     category: '学習',
@@ -99,14 +96,13 @@ Related Issue: {{issue}}`,
 優先分野: {{focus}}`,
     variable_config: [
       { key: 'goal', label: '学習目標', type: 'text' },
-      { key: 'level', label: '現在のレベル', type: 'select', options: ['Beginner', 'Intermediate', 'Advanced'] },
+      { key: 'level', label: '現在のレベル', type: 'select', options: ['初心者', '中級者', '上級者'] },
       { key: 'hours', label: '学習可能時間（週）', type: 'text' },
       { key: 'duration', label: '期間', type: 'select', options: ['1ヶ月', '3ヶ月', '6ヶ月', '1年'] },
       { key: 'focus', label: '優先分野', type: 'text' },
     ],
   },
   {
-    id: 'sample-business-email',
     title: 'ビジネスメール作成',
     description: '状況に応じたビジネスメールの文面を生成します。',
     category: 'ビジネス',
@@ -126,21 +122,86 @@ Related Issue: {{issue}}`,
       { key: 'attachment', label: '添付ファイル', type: 'text' },
     ],
   },
+  {
+    title: 'ペルソナ作成',
+    description: 'マーケティング向けのユーザーペルソナを生成します。',
+    category: 'マーケティング',
+    tags: 'persona, marketing, ux',
+    body: `以下の条件でユーザーペルソナを作成してください。
+
+名前: {{name}}
+年齢: {{age}}
+性別: {{gender}}
+好きなこと: {{interests}}`,
+    variable_config: [
+      { key: 'name', label: '名前', type: 'text' },
+      { key: 'age', label: '年齢', type: 'text' },
+      { key: 'gender', label: '性別', type: 'select', options: ['男性', '女性', 'その他'] },
+      { key: 'interests', label: '好きなこと', type: 'text' },
+    ],
+  },
 ]
+
+const CREATE_USERS = `CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  google_id TEXT UNIQUE,
+  github_id INTEGER UNIQUE,
+  email TEXT,
+  username TEXT NOT NULL DEFAULT '',
+  avatar_url TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)`
+
+const CREATE_TEMPLATES = `CREATE TABLE IF NOT EXISTS templates (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  header TEXT NOT NULL DEFAULT '',
+  fields TEXT NOT NULL DEFAULT '[]',
+  body TEXT NOT NULL DEFAULT '',
+  variable_config TEXT NOT NULL DEFAULT '[]',
+  category TEXT NOT NULL DEFAULT '',
+  tags TEXT NOT NULL DEFAULT '',
+  author_id TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+)`
+
+const CREATE_SESSIONS = `CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+)`
 
 export const seedTemplates = async (env: Record<string, unknown>) => {
   const db = (env as any).DB
 
   try {
-    const existing = await db
-      .prepare('SELECT COUNT(*) as count FROM users')
-      .first()
-    if (existing && (existing as any).count > 0) return
+    await db.prepare('SELECT COUNT(*) as count FROM users').first()
   } catch {
-    return
+    console.warn('[seed] テーブルが存在しません。自動作成します…')
+    try {
+      await db.prepare(CREATE_USERS).run()
+      await db.prepare(CREATE_TEMPLATES).run()
+      await db.prepare(CREATE_SESSIONS).run()
+    } catch (e) {
+      console.error('[seed] テーブル作成に失敗しました:', e)
+      return
+    }
   }
 
-  const authorId = crypto.randomUUID()
+  let existing: any
+  try {
+    existing = await db
+      .prepare('SELECT COUNT(*) as count FROM users')
+      .first()
+  } catch {
+    console.warn('[seed] マイグレーションを実行してください: npx wrangler d1 migrations apply prompt-template-db --local')
+    return
+  }
+  if (existing && (existing as any).count > 0) return
+
+  const authorId = uuidv7()
   const now = new Date().toISOString()
 
   try {
@@ -159,10 +220,11 @@ export const seedTemplates = async (env: Record<string, unknown>) => {
   )
 
   for (const t of sampleTemplates) {
+    const tid = uuidv7()
     try {
       await insert
         .bind(
-          t.id,
+          tid,
           t.title,
           t.description,
           t.body,
@@ -175,7 +237,7 @@ export const seedTemplates = async (env: Record<string, unknown>) => {
         )
         .run()
     } catch (e) {
-      console.error(`Seed template insert error (${t.id}):`, e)
+      console.error(`Seed template insert error (${tid}):`, e)
     }
   }
 

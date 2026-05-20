@@ -1,5 +1,7 @@
 import { type Context } from 'hono'
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
+import { getDB } from './db.js'
+import { uuidv7 } from './id.js'
 
 interface GoogleUser {
   sub: string
@@ -15,10 +17,6 @@ export interface SessionUser {
   username: string
   avatar_url: string | null
 }
-
-type Env = Record<string, unknown>
-
-const getDB = (c: Context): any => (c.env as Env).DB
 
 export const getSessionUser = async (c: Context): Promise<SessionUser | null> => {
   const sessionId = getCookie(c, 'session')
@@ -127,7 +125,7 @@ export const createOrGetUser = async (
   }
 
   const newUser: SessionUser = {
-    id: crypto.randomUUID(),
+    id: uuidv7(),
     google_id: googleUser.sub,
     email: googleUser.email,
     username: googleUser.name,
@@ -145,17 +143,19 @@ export const createOrGetUser = async (
 }
 
 export const createSession = async (c: Context, userId: string) => {
-  const sessionId = crypto.randomUUID()
+  const sessionId = uuidv7()
   const db = getDB(c)
   await db
     .prepare('INSERT INTO sessions (id, user_id) VALUES (?, ?)')
     .bind(sessionId, userId)
     .run()
 
+  const isSecure = c.req.url.startsWith('https://')
   setCookie(c, 'session', sessionId, {
     path: '/',
     httpOnly: true,
     sameSite: 'Lax',
+    secure: isSecure,
     maxAge: 60 * 60 * 24 * 30,
   })
 }
