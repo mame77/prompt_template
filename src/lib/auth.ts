@@ -1,6 +1,7 @@
 import { type Context } from 'hono'
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
 import { getDB } from './db.js'
+import { uuidv7 } from './id.js'
 
 interface GoogleUser {
   sub: string
@@ -124,7 +125,7 @@ export const createOrGetUser = async (
   }
 
   const newUser: SessionUser = {
-    id: crypto.randomUUID(),
+    id: uuidv7(),
     google_id: googleUser.sub,
     email: googleUser.email,
     username: googleUser.name,
@@ -142,7 +143,7 @@ export const createOrGetUser = async (
 }
 
 export const createSession = async (c: Context, userId: string) => {
-  const sessionId = crypto.randomUUID()
+  const sessionId = uuidv7()
   const db = getDB(c)
   await db
     .prepare('INSERT INTO sessions (id, user_id) VALUES (?, ?)')

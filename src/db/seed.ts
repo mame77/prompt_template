@@ -1,6 +1,7 @@
+import { uuidv7 } from '../lib/id.js'
+
 const sampleTemplates = [
   {
-    id: 'sample-ui-component',
     title: 'UI Component Spec',
     description: 'Figmaデザイン用のUIコンポーネント仕様を生成します。',
     category: 'デザイン',
@@ -21,7 +22,6 @@ Colors: {{colors}}`,
     ],
   },
   {
-    id: 'sample-landing-page',
     title: 'Landing Page Layout',
     description: 'Figmaワイヤーフレーミング用のランディングページ構成を生成します。',
     category: 'デザイン',
@@ -42,7 +42,6 @@ Breakpoints: {{breakpoints}}`,
     ],
   },
   {
-    id: 'sample-blog-post',
     title: 'ブログ記事構成案',
     description: 'テーマに沿ったブログ記事の構成を提案します。',
     category: '執筆',
@@ -63,7 +62,6 @@ Breakpoints: {{breakpoints}}`,
     ],
   },
   {
-    id: 'sample-code-review',
     title: 'コードレビュー依頼',
     description: 'プルリクエストのコードレビュー依頼文を生成します。',
     category: 'コード',
@@ -85,7 +83,6 @@ Related Issue: {{issue}}`,
     ],
   },
   {
-    id: 'sample-learning-plan',
     title: '学習計画立案',
     description: '目標に合わせた学習計画を生成します。',
     category: '学習',
@@ -106,7 +103,6 @@ Related Issue: {{issue}}`,
     ],
   },
   {
-    id: 'sample-business-email',
     title: 'ビジネスメール作成',
     description: '状況に応じたビジネスメールの文面を生成します。',
     category: 'ビジネス',
@@ -140,7 +136,7 @@ export const seedTemplates = async (env: Record<string, unknown>) => {
     return
   }
 
-  const authorId = crypto.randomUUID()
+  const authorId = uuidv7()
   const now = new Date().toISOString()
 
   try {
@@ -159,10 +155,11 @@ export const seedTemplates = async (env: Record<string, unknown>) => {
   )
 
   for (const t of sampleTemplates) {
+    const tid = uuidv7()
     try {
       await insert
         .bind(
-          t.id,
+          tid,
           t.title,
           t.description,
           t.body,
@@ -175,7 +172,7 @@ export const seedTemplates = async (env: Record<string, unknown>) => {
         )
         .run()
     } catch (e) {
-      console.error(`Seed template insert error (${t.id}):`, e)
+      console.error(`Seed template insert error (${tid}):`, e)
     }
   }
 

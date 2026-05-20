@@ -1,0 +1,9 @@
+-- Migration: UUIDv7 for all primary keys
+-- Previous IDs used crypto.randomUUID() (UUIDv4, random).
+-- Now using UUIDv7 (time-ordered, RFC 9562) for all primary keys.
+--
+-- Schema is unchanged (all IDs remain TEXT PRIMARY KEY).
+-- The change is in application-layer ID generation only.
+--
+-- UUIDv7 encodes a 48-bit Unix millisecond timestamp in the first bytes,
+-- making IDs naturally sortable by creation time.

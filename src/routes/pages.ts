@@ -88,17 +88,17 @@ pagesRoute.get('/', async (c) => {
 
   return c.html(
     layout(
-      { title: 'Home', user },
+      { title: 'ホーム', user },
       `
       <div class="page-header">
-        <h1>Prompt Templates</h1>
-        ${user ? '<a href="/templates/new" class="btn btn-primary">New Template</a>' : ''}
+        <h1>プロンプトテンプレート一覧</h1>
+        ${user ? '<a href="/templates/new" class="btn btn-primary">新規作成</a>' : ''}
       </div>
       ${searchBar(query)}
       ${categoryPills(activeCategory)}
       ${tabNav(tab, !!user, activeCategory, query)}
       <div class="template-grid" id="template-grid">
-        ${list || '<p class="empty-state">No templates found.</p>'}
+        ${list || '<p class="empty-state">テンプレートが見つかりません</p>'}
       </div>`,
     ),
   )
@@ -110,45 +110,45 @@ pagesRoute.get('/templates/new', async (c) => {
 
   return c.html(
     layout(
-      { title: 'New Template', user },
+      { title: '新規テンプレート作成', user },
       `
       <div class="form-page">
-        <h1>New Template</h1>
+        <h1>新規テンプレート作成</h1>
         <form action="/templates" method="POST" class="template-form">
           <div class="field-row">
-            <label class="field-label" for="title">Title *</label>
+            <label class="field-label" for="title">タイトル *</label>
             <input type="text" id="title" name="title" class="field-input" required autocomplete="off">
           </div>
           <div class="field-row">
-            <label class="field-label" for="category">Category</label>
+            <label class="field-label" for="category">カテゴリ</label>
             <select id="category" name="category" class="field-input field-select">
               <option value="">-- select --</option>
               ${CATEGORIES.filter((c) => c !== 'すべて').map((c) => `<option value="${c}">${c}</option>`).join('')}
             </select>
           </div>
           <div class="field-row">
-            <label class="field-label" for="tags">Tags</label>
-            <input type="text" id="tags" name="tags" class="field-input" placeholder="comma, separated, tags" autocomplete="off">
+            <label class="field-label" for="tags">タグ</label>
+            <input type="text" id="tags" name="tags" class="field-input" placeholder="カンマ区切りで入力" autocomplete="off">
           </div>
           <div class="field-row">
-            <label class="field-label" for="description">Description</label>
+            <label class="field-label" for="description">説明</label>
             <textarea id="description" name="description" class="field-input field-textarea"></textarea>
           </div>
           <div class="field-row">
-            <label class="field-label" for="body">Body *</label>
-            <p class="field-hint">Use <code>{{variable_name}}</code> to define variables. Each variable will become an input field.</p>
-            <textarea id="body" name="body" class="field-input field-textarea field-body" required placeholder="Write your prompt template here. Use {{variable_name}} for dynamic parts." oninput="updateVarPreview()"></textarea>
+            <label class="field-label" for="body">本文 *</label>
+            <p class="field-hint"><code>{{変数名}}</code> で変数を定義します。各変数が入力欄になります。</p>
+            <textarea id="body" name="body" class="field-input field-textarea field-body" required placeholder="プロンプトテンプレートを入力してください。{{変数名}} で動的部分を指定します。" oninput="updateVarPreview()"></textarea>
           </div>
 
           <div id="var-config-panel" class="var-config-panel">
-            <div class="fields-section-label">Variable Settings</div>
-            <p class="field-hint">Click each variable to configure its label, type, and options.</p>
+            <div class="fields-section-label">変数の設定</div>
+            <p class="field-hint">各変数をクリックしてラベル・種類・選択肢を設定します。</p>
             <div id="var-config-rows"></div>
           </div>
 
           <input type="hidden" name="variable_config" id="variable_config_input" value="[]">
 
-          <button type="submit" class="btn btn-primary btn-generate">Create Template</button>
+          <button type="submit" class="btn btn-primary btn-generate">テンプレートを作成</button>
         </form>
       </div>
 
@@ -184,19 +184,19 @@ pagesRoute.get('/templates/new', async (c) => {
               '</div>' +
               '<div class="var-config-body">' +
                 '<div class="var-config-field">' +
-                  '<label class="field-label">Label</label>' +
+                  '<label class="field-label">ラベル</label>' +
                   '<input type="text" class="field-input" value="' + escapeHtml2(cfg.label) + '" onchange="updateVarKey(\\'' + key + '\\', \\'label\\', this.value)">' +
                 '</div>' +
                 '<div class="var-config-field">' +
-                  '<label class="field-label">Type</label>' +
+                  '<label class="field-label">種類</label>' +
                   '<select class="field-input field-select" onchange="updateVarKey(\\'' + key + '\\', \\'type\\', this.value); toggleOptions(this, \\'' + key + '\\')">' +
-                    '<option value="text"' + (cfg.type === 'text' ? ' selected' : '') + '>Text</option>' +
-                    '<option value="select"' + (cfg.type === 'select' ? ' selected' : '') + '>Select</option>' +
+                    '<option value="text"' + (cfg.type === 'text' ? ' selected' : '') + '>テキスト</option>' +
+                    '<option value="select"' + (cfg.type === 'select' ? ' selected' : '') + '>選択式</option>' +
                   '</select>' +
                 '</div>' +
                 '<div class="var-config-field var-options-field"' + (cfg.type !== 'select' ? ' style="display:none"' : '') + '>' +
-                  '<label class="field-label">Options (comma separated)</label>' +
-                  '<input type="text" class="field-input" value="' + escapeHtml2(cfg.options) + '" onchange="updateVarKey(\\'' + key + '\\', \\'options\\', this.value)" placeholder="option1, option2, option3">' +
+                  '<label class="field-label">選択肢（カンマ区切り）</label>' +
+                  '<input type="text" class="field-input" value="' + escapeHtml2(cfg.options) + '" onchange="updateVarKey(\\'' + key + '\\', \\'options\\', this.value)" placeholder="選択肢1, 選択肢2, 選択肢3">' +
                 '</div>' +
               '</div>' +
             '</div>';
@@ -295,8 +295,8 @@ pagesRoute.get('/templates/:id', async (c) => {
         ${row.category ? `<span class="card-category">${escapeHtml(row.category)}</span>` : ''}
       </div>
       ${row.description ? `<p class="template-desc">${escapeHtml(row.description)}</p>` : ''}
-      <span class="card-author">by ${escapeHtml(row.username)}</span>
-      ${isOwner ? `<form action="/templates/${id}/delete" method="POST" class="inline-form delete-form" onsubmit="return confirm('Delete this template?')"><button class="btn-text btn-danger">Delete</button></form>` : ''}
+      <span class="card-author">作成者: ${escapeHtml(row.username)}</span>
+      ${isOwner ? `<form action="/templates/${id}/delete" method="POST" class="inline-form delete-form" onsubmit="return confirm('このテンプレートを削除しますか？')"><button class="btn-text btn-danger">削除</button></form>` : ''}
     </div>`
 
   if (!hasBody) {
@@ -307,7 +307,7 @@ pagesRoute.get('/templates/:id', async (c) => {
         <div class="template-page">
           ${metaHtml}
           <div class="template-fallback">
-            <p>This template uses the legacy format and cannot be edited here.</p>
+            <p>このテンプレートは旧形式のため編集できません。</p>
           </div>
         </div>`,
       ),
@@ -324,13 +324,13 @@ pagesRoute.get('/templates/:id', async (c) => {
       ${bodyPreview}
       ${fieldHtml}
       <button type="submit" class="btn btn-primary btn-generate">
-        Generate Prompt
+        プロンプトを生成
       </button>
     </form>`
 
   const previewHtml = `
     <div id="result-area">
-      ${previewPanel(`Fill in the fields${detectedVars.length > 0 ? ' on the left' : ''} and click "Generate Prompt" to see the result.`)}
+      ${previewPanel(`左側の項目を入力して「プロンプトを生成」をクリックしてください`)}
     </div>`
 
   return c.html(
@@ -347,7 +347,7 @@ pagesRoute.get('/templates/:id', async (c) => {
           if (!text) return;
           navigator.clipboard.writeText(text.textContent).then(function() {
             var orig = btn.textContent;
-            btn.textContent = 'Copied!';
+            btn.textContent = 'コピーしました！';
             setTimeout(function() { btn.textContent = orig; }, 2000);
           });
         }
