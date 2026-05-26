@@ -21,10 +21,10 @@ authRoute.get('/login', async (c) => {
     layout(
       { title: 'ログイン', user: null },
       `
-      <div class="login-page">
-        <h1>ログイン</h1>
-        <p>Google アカウントでログインして、プロンプトテンプレートを作成しましょう。</p>
-        <a href="${url}" class="btn btn-primary btn-google">
+      <div class="max-w-[420px] mx-auto my-24 mb-16 text-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-10 px-8">
+        <h1 class="text-2xl font-bold mb-2 tracking-tight">ログイン</h1>
+        <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm leading-relaxed">Google アカウントでログインして、プロンプトテンプレートを作成しましょう。</p>
+        <a href="${url}" class="btn btn-google">
           Google でログイン
         </a>
       </div>`,

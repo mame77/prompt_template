@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev --env-file .env",
-    "dev:local": "wrangler dev --env-file .env --local",
-    "deploy": "wrangler deploy",
+    "dev:css": "tailwindcss -i src/app.css -o public/style.css --watch",
+    "dev:server": "wrangler dev --env-file .env",
+    "dev": "tailwindcss -i src/app.css -o public/style.css & wrangler dev --env-file .env",
+    "build:css": "tailwindcss -i src/app.css -o public/style.css",
+    "dev:local": "bun run build:css && wrangler dev --env-file .env --local",
+    "deploy": "bun run build:css && wrangler deploy",
     "build": "bun build src/index.ts --outdir dist",
     "test": "bun test"
   },
@@ -13,6 +16,8 @@
     "hono": "latest"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0",
     "wrangler": "^4.0.0"
   }
 }

@@ -93,7 +93,7 @@ pagesRoute.get('/', async (c) => {
       ${searchBar(query)}
       ${categoryPills(activeCategory)}
       ${tabNav(tab, !!user, activeCategory, query)}
-      <div class="template-grid" id="template-grid">
+      <div class="template-grid grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-3.5" id="template-grid">
         ${list || '<p class="empty-state">テンプレートが見つかりません</p>'}
       </div>`,
     ),
@@ -108,43 +108,43 @@ pagesRoute.get('/templates/new', async (c) => {
     layout(
       { title: '新規テンプレート作成', user },
       `
-      <div class="form-page">
-        <h1>新規テンプレート作成</h1>
-        <form action="/templates" method="POST" class="template-form">
-          <div class="field-row">
+      <div class="max-w-[720px]">
+        <h1 class="text-2xl font-bold mb-6 tracking-tight bg-gradient-to-r from-violet-500 via-violet-600 to-violet-700 bg-clip-text text-transparent">新規テンプレート作成</h1>
+        <form action="/templates" method="POST" class="flex flex-col gap-3">
+          <div class="flex flex-col gap-1">
             <label class="field-label" for="title">タイトル *</label>
             <input type="text" id="title" name="title" class="field-input" required autocomplete="off">
           </div>
-          <div class="field-row">
+          <div class="flex flex-col gap-1">
             <label class="field-label" for="category">カテゴリ</label>
-            <select id="category" name="category" class="field-input field-select">
+            <select id="category" name="category" class="field-input cursor-pointer">
               <option value="">-- 選択 --</option>
               ${CATEGORIES.filter((c) => c !== 'すべて').map((c) => `<option value="${c}">${c}</option>`).join('')}
             </select>
           </div>
-          <div class="field-row">
+          <div class="flex flex-col gap-1">
             <label class="field-label" for="tags">タグ</label>
             <input type="text" id="tags" name="tags" class="field-input" placeholder="カンマ区切りで入力" autocomplete="off">
           </div>
-          <div class="field-row">
+          <div class="flex flex-col gap-1">
             <label class="field-label" for="description">説明</label>
             <textarea id="description" name="description" class="field-input field-textarea"></textarea>
           </div>
-          <div class="field-row">
+          <div class="flex flex-col gap-1">
             <label class="field-label" for="body">本文 *</label>
-            <p class="field-hint"><code>{{変数名}}</code> で変数を定義します。各変数が入力欄になります。</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mb-0.5"><code class="bg-violet-50 dark:bg-violet-900/20 px-1.5 py-0.5 rounded font-mono text-xs text-violet-600 dark:text-violet-400">{{変数名}}</code> で変数を定義します。各変数が入力欄になります。</p>
             <textarea id="body" name="body" class="field-input field-textarea field-body" required placeholder="プロンプトテンプレートを入力してください。{{変数名}} で動的部分を指定します。" oninput="updateVarPreview()"></textarea>
           </div>
 
-          <div id="var-config-panel" class="var-config-panel">
-            <div class="fields-section-label">変数の設定</div>
-            <p class="field-hint">各変数をクリックしてラベル・種類・選択肢を設定します。</p>
+          <div id="var-config-panel" class="hidden mt-2 border border-gray-200 dark:border-gray-800 rounded-xl p-3.5 bg-white dark:bg-gray-900">
+            <div class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">変数の設定</div>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mb-0.5">各変数をクリックしてラベル・種類・選択肢を設定します。</p>
             <div id="var-config-rows"></div>
           </div>
 
           <input type="hidden" name="variable_config" id="variable_config_input" value="[]">
 
-          <button type="submit" class="btn btn-primary btn-generate">テンプレートを作成</button>
+          <button type="submit" class="btn btn-generate">テンプレートを作成</button>
         </form>
       </div>
 
@@ -172,27 +172,27 @@ pagesRoute.get('/templates/new', async (c) => {
               varConfig[key] = { label: autoLabel(key), type: 'text', options: '' };
             }
             var cfg = varConfig[key];
-            html += '<div class="var-config-row">' +
-              '<div class="var-config-header" onclick="this.parentElement.classList.toggle(\\'var-expanded\\')">' +
-                '<span class="var-name">{{' + key + '}}</span>' +
-                '<span class="var-label-preview">' + escapeHtml2(cfg.label) + '</span>' +
-                '<span class="var-type-badge">' + cfg.type + '</span>' +
+            html += '<div class=\\"border border-gray-200 dark:border-gray-800 rounded-md mt-2 overflow-hidden\\">' +
+              '<div class=\\"flex items-center gap-3 px-3 py-2 cursor-pointer bg-gray-100 dark:bg-gray-800 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50\\" onclick=\\"this.parentElement.classList.toggle(\\'var-expanded\\')\\">' +
+                '<span class=\\"font-mono text-xs font-semibold text-violet-600 dark:text-violet-400 min-w-[120px]\\">{{' + key + '}}</span>' +
+                '<span class=\\"text-sm text-gray-500 dark:text-gray-400 flex-1\\">' + escapeHtml2(cfg.label) + '</span>' +
+                '<span class=\\"text-[0.7rem] px-2 py-0.5 rounded-sm bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 font-semibold uppercase tracking-wide\\">' + cfg.type + '</span>' +
               '</div>' +
-              '<div class="var-config-body">' +
-                '<div class="var-config-field">' +
-                  '<label class="field-label">ラベル</label>' +
-                  '<input type="text" class="field-input" value="' + escapeHtml2(cfg.label) + '" onchange="updateVarKey(\\'' + key + '\\', \\'label\\', this.value)">' +
+              '<div class=\\"var-config-body p-3 border-t border-gray-200 dark:border-gray-800 flex-col gap-2 bg-white dark:bg-gray-900\\">' +
+                '<div class=\\"flex flex-col gap-1\\">' +
+                  '<label class=\\"field-label\\">ラベル</label>' +
+                  '<input type=\\"text\\" class=\\"field-input\\" value=\\"' + escapeHtml2(cfg.label) + '\\" onchange=\\"updateVarKey(\\'' + key + '\\', \\'label\\', this.value)\\">' +
                 '</div>' +
-                '<div class="var-config-field">' +
-                  '<label class="field-label">種類</label>' +
-                  '<select class="field-input field-select" onchange="updateVarKey(\\'' + key + '\\', \\'type\\', this.value); toggleOptions(this, \\'' + key + '\\')">' +
-                    '<option value="text"' + (cfg.type === 'text' ? ' selected' : '') + '>テキスト</option>' +
-                    '<option value="select"' + (cfg.type === 'select' ? ' selected' : '') + '>選択式</option>' +
+                '<div class=\\"flex flex-col gap-1\\">' +
+                  '<label class=\\"field-label\\">種類</label>' +
+                  '<select class=\\"field-input\\" onchange=\\"updateVarKey(\\'' + key + '\\', \\'type\\', this.value); toggleOptions(this, \\'' + key + '\\')\\">' +
+                    '<option value=\\"text\\"' + (cfg.type === 'text' ? ' selected' : '') + '>テキスト</option>' +
+                    '<option value=\\"select\\"' + (cfg.type === 'select' ? ' selected' : '') + '>選択式</option>' +
                   '</select>' +
                 '</div>' +
-                '<div class="var-config-field var-options-field"' + (cfg.type !== 'select' ? ' style="display:none"' : '') + '>' +
-                  '<label class="field-label">選択肢（カンマ区切り）</label>' +
-                  '<input type="text" class="field-input" value="' + escapeHtml2(cfg.options) + '" onchange="updateVarKey(\\'' + key + '\\', \\'options\\', this.value)" placeholder="選択肢1, 選択肢2, 選択肢3">' +
+                '<div class=\\"flex flex-col gap-1\\"' + (cfg.type !== 'select' ? ' style=\\"display:none\\"' : '') + '>' +
+                  '<label class=\\"field-label\\">選択肢（カンマ区切り）</label>' +
+                  '<input type=\\"text\\" class=\\"field-input\\" value=\\"' + escapeHtml2(cfg.options) + '\\" onchange=\\"updateVarKey(\\'' + key + '\\', \\'options\\', this.value)\\" placeholder=\\"選択肢1, 選択肢2, 選択肢3\\">' +
                 '</div>' +
               '</div>' +
             '</div>';
@@ -208,8 +208,7 @@ pagesRoute.get('/templates/new', async (c) => {
         }
 
         function toggleOptions(select, key) {
-          var row = select.closest('.var-config-row');
-          var optsField = row.querySelector('.var-options-field');
+          var optsField = select.parentElement.nextElementSibling;
           optsField.style.display = select.value === 'select' ? 'block' : 'none';
         }
 
@@ -269,14 +268,14 @@ pagesRoute.get('/templates/:id', async (c) => {
   } catch {}
 
   const metaHtml = `
-    <div class="template-meta">
-      <div class="template-meta-top">
-        <h1>${escapeHtml(row.title)}</h1>
-        ${row.category ? `<span class="card-category">${escapeHtml(row.category)}</span>` : ''}
+    <div class="mb-7 pb-5 border-b border-gray-200 dark:border-gray-800">
+      <div class="flex items-center gap-3 mb-1 flex-wrap">
+        <h1 class="text-2xl font-bold tracking-tight">${escapeHtml(row.title)}</h1>
+        ${row.category ? `<span class="inline-flex text-[0.7rem] font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-wider bg-violet-50 dark:bg-violet-900/20 px-2 py-0.5 rounded-sm w-fit">${escapeHtml(row.category)}</span>` : ''}
       </div>
-      ${row.description ? `<p class="template-desc">${escapeHtml(row.description)}</p>` : ''}
-      <span class="card-author">作成者: ${escapeHtml(row.username)}</span>
-      ${isOwner ? `<form action="/templates/${id}/delete" method="POST" class="inline-form delete-form" onsubmit="return confirm('このテンプレートを削除しますか？')"><button class="btn-text btn-danger">削除</button></form>` : ''}
+      ${row.description ? `<p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-1">${escapeHtml(row.description)}</p>` : ''}
+      <span class="text-xs text-gray-400 dark:text-gray-500 inline-block pt-1">作成者: ${escapeHtml(row.username)}</span>
+      ${isOwner ? `<form action="/templates/${id}/delete" method="POST" class="inline" onsubmit="return confirm('このテンプレートを削除しますか？')"><button class="btn-text btn-danger">削除</button></form>` : ''}
     </div>`
 
   if (!body) {
@@ -284,9 +283,9 @@ pagesRoute.get('/templates/:id', async (c) => {
       layout(
         { title: row.title, user },
         `
-        <div class="template-page">
+        <div>
           ${metaHtml}
-          <div class="template-fallback">
+          <div class="text-gray-500 dark:text-gray-400 py-10 text-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl">
             <p>このテンプレートは旧形式のため編集できません。</p>
           </div>
         </div>`,
@@ -306,46 +305,46 @@ pagesRoute.get('/templates/:id', async (c) => {
           )
           .join('')
         return `
-        <div class="field-card">
-          <label class="field-card-label">${label}</label>
-          <select class="field-card-input" data-var="${v.key}" onchange="selectNext(this)">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 mb-3">
+          <label class="block text-base font-semibold text-gray-900 dark:text-gray-100 mb-1.5">${label}</label>
+          <select class="block w-full px-3.5 py-2 border border-gray-200 dark:border-gray-800 rounded-md text-base bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-gray-100 transition-all focus:outline-none focus:border-violet-600 focus:shadow-[0_0_0_3px_rgba(124,58,237,0.12)]" data-var="${v.key}" onchange="selectNext(this)">
             <option value="">選択してください</option>
             ${opts}
           </select>
         </div>`
       }
       return `
-        <div class="field-card">
-          <label class="field-card-label">${label}</label>
-          <input type="text" class="field-card-input" data-var="${v.key}" placeholder="${label}" autocomplete="off">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 mb-3">
+          <label class="block text-base font-semibold text-gray-900 dark:text-gray-100 mb-1.5">${label}</label>
+          <input type="text" class="block w-full px-3.5 py-2 border border-gray-200 dark:border-gray-800 rounded-md text-base bg-gray-50 dark:bg-[#09090b] text-gray-900 dark:text-gray-100 transition-all focus:outline-none focus:border-violet-600 focus:shadow-[0_0_0_3px_rgba(124,58,237,0.12)]" data-var="${v.key}" placeholder="${label}" autocomplete="off">
         </div>`
     })
     .join('\n')
 
   const pageContent = `
-    <div class="template-page template-use-page">
+    <div class="max-w-[640px] mx-auto">
       ${metaHtml}
 
-      <div class="fields-section">
+      <div class="mt-6">
         ${fieldsHtml || '<p class="empty-state">このテンプレートには入力項目がありません</p>'}
       </div>
 
-      <div class="complete-section">
+      <div class="text-center mt-8">
         <button class="btn btn-primary btn-complete" id="generate-btn" onclick="generatePrompt()">
           完了
         </button>
       </div>
 
-      <div class="result-panel" id="result-area" style="display:none;">
-        <div class="result-header">
-          <h2 class="result-title">生成されたプロンプト</h2>
+      <div class="mt-8 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden bg-white dark:bg-gray-900 animate-fade-in" id="result-area" style="display:none;">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800">
+          <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-tight">生成されたプロンプト</h2>
           <button class="btn btn-primary btn-copy" onclick="copyPrompt(this)">コピー</button>
         </div>
-        <pre class="prompt-output" id="prompt-display"></pre>
+        <pre class="font-mono text-sm leading-relaxed whitespace-pre-wrap overflow-x-auto max-h-[65vh] overflow-y-auto p-5 text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-[#0d0d10]" id="prompt-display"></pre>
       </div>
     </div>
 
-    <div id="toast" class="toast">コピーしました</div>
+    <div id="toast" class="toast bg-gray-900 dark:bg-gray-50 text-gray-50 dark:text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full shadow-lg">コピーしました</div>
 
     <script id="template-raw-data" type="application/json">${JSON.stringify(body)}</script>
     <script>
@@ -355,7 +354,7 @@ pagesRoute.get('/templates/:id', async (c) => {
     document.addEventListener('DOMContentLoaded', function() {
       var first = document.querySelector('[data-var]');
       if (first) first.focus();
-      document.querySelector('.fields-section').addEventListener('keydown', function(e) {
+      document.querySelector('.mt-6').addEventListener('keydown', function(e) {
         if (e.key !== 'Enter') return;
         e.preventDefault();
         selectNext(e.target);

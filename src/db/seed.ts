@@ -127,17 +127,25 @@ Related Issue: {{issue}}`,
     description: 'マーケティング向けのユーザーペルソナを生成します。',
     category: 'マーケティング',
     tags: 'persona, marketing, ux',
-    body: `以下の条件でユーザーペルソナを作成してください。
+    body: `Generate a persona image based on the following conditions.
 
+【persona payload】
 名前: {{name}}
 年齢: {{age}}
 性別: {{gender}}
-好きなこと: {{interests}}`,
+職業: {{occupation}}
+困っていること: {{challenges}}
+
+[Image Generation Prompt Conditions]
+- photorealistic
+- realistic portrait of a Japanese person
+- simple background`,
     variable_config: [
       { key: 'name', label: '名前', type: 'text' },
       { key: 'age', label: '年齢', type: 'text' },
       { key: 'gender', label: '性別', type: 'select', options: ['男性', '女性', 'その他'] },
-      { key: 'interests', label: '好きなこと', type: 'text' },
+      { key: 'occupation', label: '職業', type: 'text' },
+      { key: 'challenges', label: '困っていること', type: 'text' },
     ],
   },
 ]
